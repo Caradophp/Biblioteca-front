@@ -1,0 +1,9 @@
+.ReservationButton {
+    text-decoration: none;
+    color: black;
+}
+
+.reservar {
+    border-radius: 15px;
+    background-color: lawngreen;
+}
