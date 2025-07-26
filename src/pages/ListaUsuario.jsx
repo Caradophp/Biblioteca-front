@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const ListarUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [erro, setErro] = useState(null);
+  const inputRef = useRef(null);  // Ref para o input do autocomplete
 
   useEffect(() => {
+    // Função para pegar os usuários
     const fetchUsuarios = async () => {
       try {
         const token = localStorage.getItem("token"); // 🔹 Pega o token do localStorage
@@ -34,13 +36,13 @@ const ListarUsuarios = () => {
     fetchUsuarios();
   }, []);
 
-  function AutoCompleteInput() {
-  const inputRef = useRef(null);
-
   useEffect(() => {
-    fetch("https://localhost:8080/usuarios") // 👉 Altere para sua URL real
-      .then(res => res.json())
-      .then(data => {
+    // Função para inicializar o autocomplete
+    const fetchAutocompleteData = async () => {
+      try {
+        const response = await fetch("https://localhost:8080/usuarios"); // 🔹 Altere para sua URL real
+        const data = await response.json();
+        
         // Transforma o array em objeto para o autocomplete
         const autoData = {};
         data.forEach(item => {
@@ -48,14 +50,19 @@ const ListarUsuarios = () => {
         });
 
         // Inicializa o autocomplete
-        const options = { data: autoData };
-        const instance = window.M.Autocomplete.init(inputRef.current, options);
+        if (inputRef.current) {
+          const options = { data: autoData };
+          const instance = window.M.Autocomplete.init(inputRef.current, options);
 
-        return () => instance.destroy(); // Limpa ao desmontar
-      })
-      .catch(err => console.error("Erro ao carregar autocomplete:", err));
-  }, []);
+          return () => instance.destroy(); // Limpa ao desmontar
+        }
+      } catch (err) {
+        console.error("Erro ao carregar autocomplete:", err);
+      }
+    };
 
+    fetchAutocompleteData();
+  }, []);  // Só roda uma vez, quando o componente é montado
 
   return (
     <div className="container">
@@ -68,7 +75,12 @@ const ListarUsuarios = () => {
           <div className="row">
             <div className="input-field col s12">
               <i className="material-icons prefix">textsms</i>
-              <input type="text" id="nome-input" className="autocomplite"/>
+              <input
+                ref={inputRef} // Usa o ref no input para o autocomplete
+                type="text"
+                id="nome-input"
+                className="autocomplete"
+              />
               <label htmlFor="nome-input">Nome</label>
             </div>
           </div>
@@ -92,7 +104,9 @@ const ListarUsuarios = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="2" className="center-align">Nenhum usuário encontrado.</td>
+              <td colSpan="2" className="center-align">
+                Nenhum usuário encontrado.
+              </td>
             </tr>
           )}
         </tbody>
