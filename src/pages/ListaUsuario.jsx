@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import GlobalConstants from "../utils/GlobalContants";
 
 const ListarUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -40,7 +41,7 @@ const ListarUsuarios = () => {
     // Função para inicializar o autocomplete
     const fetchAutocompleteData = async () => {
       try {
-        const response = await fetch("https://localhost:8080/usuarios"); // 🔹 Altere para sua URL real
+        const response = await fetch(GlobalConstants.API_BASE_URL + "/usuarios"); // 🔹 Altere para sua URL real
         const data = await response.json();
         
         // Transforma o array em objeto para o autocomplete
@@ -68,13 +69,11 @@ const ListarUsuarios = () => {
     <div className="container">
       <h2 className="center-align">Lista de Usuários</h2>
 
-      {erro && <p className="red-text">{erro}</p>}
-
       <div className="row">
         <div className="col s12">
           <div className="row">
             <div className="input-field col s12">
-              <i className="material-icons prefix">textsms</i>
+              <i className="material-icons prefix"></i>
               <input
                 ref={inputRef} // Usa o ref no input para o autocomplete
                 type="text"

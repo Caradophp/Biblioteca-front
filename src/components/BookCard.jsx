@@ -12,6 +12,7 @@ const BookCard = ({ book }) => {
       </div>
       <div className="card-action">
         <a href={`/book/${book.id}`} className="waves-effect waves-light btn">Reservar</a>
+        <a href={`/book/${book.id}`} className="waves-effect waves-teal btn-flat button">Descrição</a>
       </div>
     </div>
   );

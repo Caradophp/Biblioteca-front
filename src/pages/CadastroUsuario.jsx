@@ -36,7 +36,7 @@ const CadastroUsuario = () => {
     numero_matricula: numeroMatricula,
     escola
   };
-
+  
   const token = localStorage.getItem("token"); // 🔹 Pega o token salvo no login
 
   try {
