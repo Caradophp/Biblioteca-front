@@ -10,17 +10,18 @@ import ListaUsuario from './pages/ListaUsuario';
 import PrivateRoute from './components/Privateroute';
 import ListarLivros from './pages/ListLivros';
 import EmprestimosList from './pages/EmprestimosList';
+import Loader from './components/Loader';
 
 function AppContent() {
   const location = useLocation();
   
-  // Define quais rotas NÃO devem exibir a Navbar
   const esconderNavbar = location.pathname === '/';
 
   return (
     <>
       {!esconderNavbar && <Navbar />}
       <div>
+        {/* <Loader /> */}
         <Routes>
           <Route path="/" element={<LoginUsuario />} />
           <Route path='/livros' element={<ListarLivros />} />
@@ -38,6 +39,15 @@ function AppContent() {
               <EmprestimosList />
             </PrivateRoute>} />
         </Routes>
+      </div>
+      <div id="modalSessaoExpirada" class="modal">
+        <div class="modal-content">
+          <h4>Atenção</h4>
+          <p>Sua sessão expirou, faça login novamente.</p>
+        </div>
+        <div class="modal-footer">
+          <a href="/" class="modal-close btn red btn-al"><i className='material-icons'>lock_outline</i>Logar Novamente</a>
+        </div>
       </div>
     </>
   );

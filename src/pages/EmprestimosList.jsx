@@ -2,6 +2,7 @@ import CrudComponent from "../components/CrudComponent";
 import { useEffect, useState } from "react";
 import Toast from "../utils/Toast";
 import M from "materialize-css";
+import AutoCompleteField from "../components/AutoCompleteField";
 
 const EmprestimosList = () => {
 
@@ -205,14 +206,18 @@ const EmprestimosList = () => {
                 <div className="modal-content">
                     <h4>Registrar novo Empréstimo</h4>
                     <form id="inc" onSubmit={salvar}>
-                        <div className="input-field">
-                            <input type="text" className="autocomplete" id="tituloLivro" name="tituloLivro" required />
-                            <label htmlFor="tituloLivro">Título do Livro</label>
-                        </div>
-                        <div className="input-field">
-                            <input type="text" className="autocomplete" id="nomeUsuario" name="nomeUsuario" required />
-                            <label htmlFor="nomeUsuario">Nome do Usuário</label>
-                        </div>
+                        <AutoCompleteField 
+                            label="Título do Livro"
+                            url="http://localhost:8080/livros"
+                            labelField="titulo"
+                            onSelect={(id) => setIdLivro(id)}
+                        />
+                        <AutoCompleteField 
+                            label="Nome do Usuário"
+                            url="http://localhost:8080/usuarios"
+                            labelField="nome"
+                            onSelect={(id) => setIdUsuario(id)}
+                        />
                     </form>
                 </div>
                 <div className="modal-footer fixed-footer">
