@@ -1,6 +1,6 @@
 export default function ModalRecuperacao({ submitAction }) {
     return (
-        <div id="modalRecuperacao" className="modal">
+        <div id="modalRecuperacao" className="modal my-modal">
             <div className="modal-content">
                 <h4>Recuperação de Senha</h4>
                 <p>Insira seu email para receber as instruções de recuperação.</p>

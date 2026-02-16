@@ -20,7 +20,7 @@ export default function ModalConfirme({ id, title, message, onConfirm }) {
     }
 
     return (
-        <div id={id} className="modal confirme" >
+        <div id={id} className="modal confirme my-modal" >
             <div className="modal-content">
                 <h4>{title}</h4>
                 <p>{message}</p>

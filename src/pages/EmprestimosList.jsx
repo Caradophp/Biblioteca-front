@@ -1,8 +1,10 @@
 import CrudComponent from "../components/CrudComponent";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Toast from "../utils/Toast";
 import M from "materialize-css";
 import AutoCompleteField from "../components/AutoCompleteField";
+import DecoratedButton from "../components/DecoratedButton";
+import Modal50Percent from "../components/mod/Modal50Percent";
 
 const EmprestimosList = () => {
 
@@ -13,11 +15,16 @@ const EmprestimosList = () => {
     const [idLivro, setIdLivro] = useState(null);
     const [idUsuario, setIdUsuario] = useState(null);
     const [busca, setBusca] = useState('');
+    const [emprestimoSelecionado, setEmprestimoSelecionado] = useState(null);
+    const [info, setInfo] = useState(null);
+
+    const modalref = useRef();
     
      const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'idLivro') setIdLivro(value);
         if (name === 'idUsuario') setIdUsuario(value);
+        if (name === 'busca') setBusca(value);
      }
 
     function openInc() {
@@ -36,6 +43,35 @@ const EmprestimosList = () => {
         instance.open();
     }
 
+    async function abrirModalEdit(item) {
+        setId(item.id);
+        const elem = document.getElementById("modal1");
+        const instance = M.Modal.getInstance(elem);
+        instance.open();
+        setModoModal('edit');
+
+        try {
+            const response = await fetch(`http://localhost:8080/emprestimos/${item.id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Erro ao buscar detalhes do empréstimo");
+        }
+
+        setIdLivro(data.livro.id);
+        setIdUsuario(data.usuario.id);
+        } catch (error) {
+            Toast.error("Erro ao abrir modal de edição: " + error.message);
+        }
+    }
+
     function limparCampos() {
         document.getElementById("inc").reset();
         setIdLivro(null);
@@ -50,32 +86,118 @@ const EmprestimosList = () => {
             return;
         }
 
+        try {
 
-        const response = await fetch("http://localhost:8080/emprestimos", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            body: JSON.stringify({
-                idLivro,
-                idUsuario
-            }),
-        });
+            if (modoModal === 'add') {
+                const response = await fetch("http://localhost:8080/emprestimos", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                        idLivro,
+                        idUsuario
+                    }),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    Toast.error("Erro ao salvar empréstimo: " + errorData.aviso);
+                    return;
+                }
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            Toast.error("Erro ao salvar empréstimo: " + errorData.message);
-            return;
+                Toast.success("Empréstimo registrado com sucesso!");
+                setIdLivro(null);
+                setIdUsuario(null);
+                const elem = document.getElementById("modal1");
+                const instance = M.Modal.getInstance(elem);
+                instance.close();
+                buscarEmprestimos();
+            } else {
+                const response = await fetch(`http://localhost:8080/emprestimos/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                        idLivro,
+                        idUsuario
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    Toast.error("Erro ao salvar empréstimo: " + errorData.aviso);
+                    return;
+                }
+
+                Toast.success("Empréstimo registrado com sucesso!");
+                setIdLivro(null);
+                setIdUsuario(null);
+                const elem = document.getElementById("modal1");
+                const instance = M.Modal.getInstance(elem);
+                instance.close();
+                buscarEmprestimos();
+            }
+
+        } catch (error) {
+            Toast.error(error);
         }
+        // if (!response.ok) {
+        //     const errorData = await response.json();
+        //     Toast.error("Erro ao salvar empréstimo: " + errorData.message);
+        //     return;
+        // }
 
-        Toast.success("Empréstimo registrado com sucesso!");
-        setIdLivro(null);
-        setIdUsuario(null);
-        const elem = document.getElementById("modal1");
-        const instance = M.Modal.getInstance(elem);
-        instance.close();
-        buscarEmprestimos();
+        // Toast.success("Empréstimo registrado com sucesso!");
+        // setIdLivro(null);
+        // setIdUsuario(null);
+        // const elem = document.getElementById("modal1");
+        // const instance = M.Modal.getInstance(elem);
+        // instance.close();
+        // buscarEmprestimos();
+    }
+
+    async function pesquisar() {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                throw new Error("Usuário não autenticado.");
+            }
+
+            if (busca === '') {
+                const response = await fetch("http://localhost:8080/emprestimos", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar livros");
+                }
+                const data = await response.json();
+                setEmprestimos(data);
+                return;
+            }
+            const response = await fetch("http://localhost:8080/emprestimos/buscar?param="+busca, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Erro ao buscar empréstimos");
+            }
+
+            const data = await response.json();
+            setEmprestimos(data);
+        } catch (error) {
+            console.error(error.message);
+        }
     }
 
     async function buscarEmprestimos() {
@@ -153,12 +275,36 @@ const EmprestimosList = () => {
         }
     }
 
-    async function buscar() {
-        Toast.info("Funcionalidade de buscar empréstimos ainda não implementada.");
-    }
-
     async function editar() {
-        Toast.info("Funcionalidade de editar empréstimo ainda não implementada.");
+        try {
+            const response = await fetch(`http://localhost:8080/emprestimos/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: JSON.stringify({
+                    idLivro,
+                    idUsuario
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                Toast.error("Erro ao editar empréstimo: " + errorData.message);
+                return;
+            }
+
+            Toast.success("Empréstimo editado com sucesso!");
+            setIdLivro(null);
+            setIdUsuario(null);
+            const elem = document.getElementById("modal1");
+            const instance = M.Modal.getInstance(elem);
+            instance.close();
+            buscarEmprestimos();
+        } catch (error) {
+            Toast.error("Erro ao editar empréstimo: " + error.message);
+        }
     }
     
     async function excluir() {
@@ -172,7 +318,7 @@ const EmprestimosList = () => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            Toast.error("Erro ao excluir empréstimo: " + errorData.message);
+            Toast.error("Erro ao excluir empréstimo: " + errorData.aviso);
             return;
         }
 
@@ -180,8 +326,35 @@ const EmprestimosList = () => {
         buscarEmprestimos();
     }
 
-    async function pesquisar() {
-        Toast.info("Funcionalidade de pesquisar empréstimos ainda não implementada.");
+    async function refresh() {
+        document.getElementById("busca").value = '';
+        setBusca('');
+        buscarEmprestimos();
+    }
+
+    async function getEmprestimoInfos(item) {
+        
+        try {
+            const response = await fetch(`http://localhost:8080/emprestimos/devolver/${item.id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                }
+            });
+
+            let data = await response.json();
+
+            if (!response.ok) {
+                Toast.error(data.aviso);
+                return;
+            }
+
+            setInfo(data);
+        } catch(error) {
+            Toast.error(error);
+        }
+
     }
 
     useEffect(() => {
@@ -194,15 +367,36 @@ const EmprestimosList = () => {
             <CrudComponent 
                 data={emprestimos}
                 onAdd={() => openInc()}
-                onEdit={() => alert("Editar empréstimo - Funcionalidade não implementada")}
+                onEdit={(item) => abrirModalEdit(item)}
                 onDelete={() => excluir()}
                 onDetails={() => alert("Detalhes do empréstimo - Funcionalidade não implementada")}
-                onSearch={() => pesquisar()}
+                onSearch={pesquisar}
                 fields={["id", "tituloLivro", "nomeUsuario"]}
                 heads={["ID", "Título do Livro", "Nome do Usuário"]}
                 openModal={(item) => abrirModal(item)}
+                handleSearchChange={handleChange}
+                onRefresh={() => refresh()}
+                extButtons={
+                    <>
+                     <DecoratedButton 
+                        icon="book"
+                        action={(item) => {
+                            getEmprestimoInfos(item)
+                            modalref.current.open()
+                        }}
+                        text=""
+                        description="Abre um janela para vizualiar o status do empréstimo e realizar operações de devolução, cobrança de multa, entre outras"
+                     />
+                    </>
+                }
             />
-            <div id="modal1" className="modal">
+            <Modal50Percent ref={modalref} title="Devolução de empréstimo">
+                {erro && <div className="card-panel red lighten-2">{erro}</div>}
+                <div>
+                    {/* <p>{info.id}</p> */}
+                </div>
+            </Modal50Percent>
+            <div id="modal1" className="modal my-modal">
                 <div className="modal-content">
                     <h4>Registrar novo Empréstimo</h4>
                     <form id="inc" onSubmit={salvar}>
@@ -210,12 +404,14 @@ const EmprestimosList = () => {
                             label="Título do Livro"
                             url="http://localhost:8080/livros"
                             labelField="titulo"
+                            selectedId={idLivro}
                             onSelect={(id) => setIdLivro(id)}
                         />
                         <AutoCompleteField 
                             label="Nome do Usuário"
                             url="http://localhost:8080/usuarios"
                             labelField="nome"
+                            selectedId={idUsuario}
                             onSelect={(id) => setIdUsuario(id)}
                         />
                     </form>

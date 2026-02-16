@@ -286,7 +286,7 @@ const ListarLivros = () => {
                     </tbody>
                 </table>
             </div>
-            <div id="modal1" className="modal">
+            <div id="modal1" className="modal my-modal">
                 <div className="modal-content">
                     <h4>Adicionar Novo Livro</h4>
                     {mensagem && <p className="card-panel red" id="erroMsg">{mensagem}</p>}

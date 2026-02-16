@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import Toast from "../utils/Toast";
+import M from "materialize-css";
 
-export default function AutoCompleteField({label, url, onSelect, labelField}) {
+
+export default function AutoCompleteField({label, url, onSelect, labelField, selectedId}) {
     const [data, setData] = useState([]);
     const inputRef = useRef(null);
 
@@ -47,6 +49,19 @@ export default function AutoCompleteField({label, url, onSelect, labelField}) {
             },
         });
     }, [data, labelField, onSelect]);
+
+    useEffect(() => {
+        if (!selectedId || data.length === 0) return;
+
+        const selecionado = data.find(item => item.id === selectedId);
+
+        if (selecionado && inputRef.current) {
+            inputRef.current.value = selecionado[labelField];
+            M.updateTextFields();
+        }
+
+    }, [selectedId, data, labelField]);
+
 
     return (
         <div className="input-field">

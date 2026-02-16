@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import M from 'materialize-css';
+import Toast from '../utils/Toast';
 
 const CadastroUsuario = () => {
   const [nome, setNome] = useState('');
@@ -9,6 +10,7 @@ const CadastroUsuario = () => {
   const [numeroMatricula, setNumeroMatricula] = useState('');
   const [escola, setEscola] = useState('');
   const [mensagem, setMensagem] = useState('');
+  const [erro, setErro] = useState(null);
 
   // Inicializar Materialize Select
   useEffect(() => {
@@ -28,12 +30,19 @@ const CadastroUsuario = () => {
   const handleSubmit = async (e) => {
   e.preventDefault();
 
+  if (!nome || !email || !senha || !tipoUsuario || !numeroMatricula || !escola) {
+    setErro('Por favor, preencha todos os campos.');
+    return;
+  } else {
+    setErro(null);
+  }
+
   const usuario = {
     nome,
     email,
     senha,
-    tipo_usuario: tipoUsuario,
-    numero_matricula: numeroMatricula,
+    tipoUsuario,
+    matricula: numeroMatricula,
     escola
   };
   
@@ -50,14 +59,15 @@ const CadastroUsuario = () => {
     });
 
     if (response.ok) {
+      setErro(null);
       setMensagem('Usuário cadastrado com sucesso!');
     } else {
       const data = await response.json();
-      setMensagem(`Erro: ${data.message || 'Erro desconhecido'}`);
+      setErro(`Erro: ${data.aviso || 'Erro desconhecido'}`);
     }
   } catch (error) {
     console.error(error);
-    setMensagem('Erro ao conectar com a API.');
+    setErro('Erro ao conectar com a API.');
   }
 };
 
@@ -66,6 +76,7 @@ const CadastroUsuario = () => {
       <h2>Cadastro de Usuário</h2>
 
       {mensagem && <div className="card-panel teal lighten-2">{mensagem}</div>}
+      {erro && <div className="card-panel red lighten-2">{erro}</div>}
 
       <form onSubmit={handleSubmit} className="col s12">
         <div className="input-field">

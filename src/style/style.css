@@ -70,6 +70,34 @@
     margin-bottom: 20px;
 }
 
+.half-percent {
+    top: 10px !important;      /* começa do topo */
+    left: 10px !important;
+    right: 0 !important;
+    width: 99vw !important;
+    height: 50vh !important;  /* metade da tela */
+    margin: 0 !important;
+    border-radius: 0 !important; /* opcional */
+}
+
+.simple-btn {
+    border: none !important;
+    background: none !important;
+    cursor: pointer;
+}
+
+.my-modal {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    max-height: 90% !important;
+}
+
+/* .half-percent foo {
+    width: 100vw;
+    height: 100vh;
+} */
+
+
 #loading {
     position: fixed;
     top: 0;

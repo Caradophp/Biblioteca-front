@@ -7,13 +7,13 @@ import OptionPanel from '../components/OptionPanel';
 import ButtonsColumn from '../components/ButtonsColumn';
 import ModalConfirme from '../components/ModalConfirme';
 
-const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fields, heads, openModal, extOptions, extButtons }) => {
+const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fields, heads, openModal, extOptions, extButtons,  handleSearchChange, onRefresh}) => {
 
     const [searchTerm, setSearchTerm] = useState("");
 
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
-    };
+    // const handleSearchChange = (e) => {
+    //     setSearchTerm(e.target.value);
+    // };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -34,7 +34,7 @@ const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fie
                 onAdd={onAdd}
                 onSearch={handleSearch}
                 onSearchChange={handleSearchChange}
-                onRefresh={() => onSearch("")}
+                onRefresh={onRefresh}
                 children={extOptions}
             />
 
