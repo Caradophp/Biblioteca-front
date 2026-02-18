@@ -39,6 +39,7 @@ const ModalValidarSenha = forwardRef((props, ref) => {
             }
 
             const data = await response.json();
+            localStorage.removeItem('token');
             localStorage.setItem('token', data.token);
 
             window.location.reload();

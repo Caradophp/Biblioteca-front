@@ -5,6 +5,7 @@ import M from "materialize-css";
 import AutoCompleteField from "../components/AutoCompleteField";
 import DecoratedButton from "../components/DecoratedButton";
 import Modal50Percent from "../components/mod/Modal50Percent";
+import ModalPayment from "../components/mod/ModalPayment";
 
 const EmprestimosList = () => {
 
@@ -19,6 +20,7 @@ const EmprestimosList = () => {
     const [info, setInfo] = useState(null);
 
     const modalref = useRef();
+    const paymentModal = useRef();
     
      const handleChange = (e) => {
         const { name, value } = e.target;
@@ -357,8 +359,49 @@ const EmprestimosList = () => {
 
     }
 
+    async function devolver(id) {
+        try {
+            const response = await fetch(`http://localhost:8080/emprestimos/devolver/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                }
+            });
+
+            let mensagem = await response.json();
+
+            M.toast({html: `<strong>${mensagem.aviso}</strong>`})
+        } catch (error) {
+            Toast.error(error);
+        }
+    }
+
+    async function marcarNaoDevolvido(id) {
+
+        if (window.confirm("Deseja realmente realizar esse operação?")) {
+            try {
+                const response = await fetch(`http://localhost:8080/emprestimos/remarcar/${id}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    }
+                });
+
+                let mensagem = await response.json();
+
+                M.toast({html: `<strong>${mensagem.aviso}</strong>`})
+            } catch (error) {
+                Toast.error(error);
+            }
+        }
+    }
+
     useEffect(() => {
         buscarEmprestimos();
+        const elems = document.querySelectorAll('.modal');
+        M.Modal.init(elems);
     }, []);
 
     return (
@@ -377,8 +420,7 @@ const EmprestimosList = () => {
                 handleSearchChange={handleChange}
                 onRefresh={() => refresh()}
                 extButtons={
-                    <>
-                     <DecoratedButton 
+                    <DecoratedButton 
                         icon="book"
                         action={(item) => {
                             getEmprestimoInfos(item)
@@ -386,16 +428,85 @@ const EmprestimosList = () => {
                         }}
                         text=""
                         description="Abre um janela para vizualiar o status do empréstimo e realizar operações de devolução, cobrança de multa, entre outras"
-                     />
-                    </>
+                    />
                 }
             />
             <Modal50Percent ref={modalref} title="Devolução de empréstimo">
                 {erro && <div className="card-panel red lighten-2">{erro}</div>}
+                {info && info.devolvido == true && <div className="card-panel blue lighten-2">Usuário já realizou a devolução do livro</div>}
+                {info && info.devolvido == false && info.multaValor > 0 && <div className="card-panel yellow lighten-2">Usuário tem uma multa para ser paga</div>}
                 <div>
-                    {/* <p>{info.id}</p> */}
+                    {info && <section>
+                            <div className="row">
+                                <div className="col s6">
+                                    <label htmlFor="usuario">Nome do usuário</label>
+                                    <input type="text" id="usuario" value={info.usuario.nome} readOnly/>
+                                </div>
+                                <div className="col s6">
+                                    <label htmlFor="titulo">Título do livro</label>
+                                    <input type="text" name="" id="titulo" value={info.livro.titulo} readOnly/>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div>
+                                    <label htmlFor="dataEmprestimo">Data do empréstimo</label>
+                                    <input type="date" id="dataEmprestimo" value={info.dataEmprestimo} readOnly/>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div>
+                                    <label htmlFor="dataEmprestimo">Data de devolução</label>
+                                    <input type="date" id="dataEmprestimo" value={info.dataDevolucao} readOnly/>
+                                </div>
+                            </div>
+                            {info.devolvido == false && info.multaValor == 0 && <div className="row">
+                                    <div className="col s11"></div>
+                                    <div className="col s1">
+                                        <DecoratedButton 
+                                            text="Realizar devolução"
+                                            icon="send"
+                                            action={() => devolver(info.id)}
+                                            description="Registra o emprestimo como devolvido"
+                                        />
+                                    </div>
+                                </div>
+                            }
+                            {info.devolvido == true && <div className="row">
+                                    <div className="col s10"></div>
+                                    <div className="col s2">
+                                        <DecoratedButton 
+                                            text="Marcar Como não devolvido"
+                                            icon="send"
+                                            action={() => marcarNaoDevolvido(info.id)}
+                                            description="Registra o emprestimo como não devolvido"
+                                        />
+                                    </div>
+                                </div>
+                            }
+                            {info.multaValor > 0 && <div className="row">
+                                    <div className="col s10"></div>
+                                    <div className="col s2">
+                                        <DecoratedButton 
+                                            text="Erro humano"
+                                            description="Anula a multa, considerando que se trata de uma cobrança indevida, por um erro de registro cometido pelo administrador"
+                                            icon="block"
+                                        />
+                                        <DecoratedButton 
+                                            text="Pagar multa"
+                                            icon="monetization_on"
+                                            action={() => {
+                                                paymentModal.current?.open();
+                                            }}
+                                            description="Realizar pagamento da multa"
+                                        />
+                                    </div>
+                                </div>
+                            }
+                        </section>
+                    }
                 </div>
             </Modal50Percent>
+            <ModalPayment ref={paymentModal} info={info} />
             <div id="modal1" className="modal my-modal">
                 <div className="modal-content">
                     <h4>Registrar novo Empréstimo</h4>

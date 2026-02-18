@@ -40,13 +40,16 @@ function AppContent() {
             </PrivateRoute>} />
         </Routes>
       </div>
-      <div id="modalSessaoExpirada" class="modal">
+      <div id="modalSessaoExpirada" class="modal my-modal">
         <div class="modal-content">
           <h4>Atenção</h4>
           <p>Sua sessão expirou, faça login novamente.</p>
         </div>
         <div class="modal-footer">
-          <a href="/" class="modal-close btn red btn-al"><i className='material-icons'>lock_outline</i>Logar Novamente</a>
+          <button class="modal-close btn red btn-al" onClick={() => {
+            localStorage.removeItem("token")
+            window.location.href = '/'
+          }}><i className='material-icons'>lock_outline</i>Logar Novamente</button>
         </div>
       </div>
     </>

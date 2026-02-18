@@ -59,7 +59,7 @@ const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fie
                                     onEdit={() => onEdit(item)} 
                                     onDelete={() => openModal(item)} 
                                     onDetails={() => onDetails(item)} 
-                                    extraButton={extButtons}
+                                    extraButton={extButtons && React.cloneElement(extButtons, {item})}
                                 />
                             </td>
                         </tr>

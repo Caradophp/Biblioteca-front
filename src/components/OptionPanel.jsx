@@ -15,7 +15,7 @@ const OptionPanel = ({ onAdd, onSearch, onSearchChange, onRefresh, children }) =
             <form className="search-form" style={{display: 'flex'}} onSubmit={onSearch}>
                 <input type="search" name="busca" id="busca" placeholder="Buscar..." onChange={onSearchChange}/>
                 <button type="submit" className="btn waves-effect waves-light"><i className="material-icons">search</i></button>
-                <button type="button" className='btn waver-effect waves-light' onClick={onRefresh}><i className='material-icons'>refresh</i></button>
+                <button type="button" className='btn waver-effect waves-light' onClick={onRefresh}><i className='material-icons'>loop</i></button>
             </form>
         </div>
     );
