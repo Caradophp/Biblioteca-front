@@ -398,6 +398,34 @@ const EmprestimosList = () => {
         }
     }
 
+    async function erroHumano() {    
+            try {
+                const response = await fetch(`http://localhost:8080/multa/erro/humano`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify({
+                        idEmprestimo: info.id,
+                        multaValor: info.multaValor,
+                        tipoPagamento: 'dinheiro'
+                    })
+                })
+    
+                let mensagem = await response.json();
+                if (!response.ok) {
+                    Toast.warning(mensagem.aviso);
+                    return;
+                }
+    
+                Toast.success("Multa paga com sucesso");
+                instanceRef.current?.close()
+            } catch (error) {
+                Toast.error(error);
+            }
+        }
+
     useEffect(() => {
         buscarEmprestimos();
         const elems = document.querySelectorAll('.modal');
@@ -490,6 +518,7 @@ const EmprestimosList = () => {
                                             text="Erro humano"
                                             description="Anula a multa, considerando que se trata de uma cobrança indevida, por um erro de registro cometido pelo administrador"
                                             icon="block"
+                                            action={() => erroHumano()}
                                         />
                                         <DecoratedButton 
                                             text="Pagar multa"
