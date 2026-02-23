@@ -64,40 +64,6 @@ const LoginUsuario = () => {
     }
   };
 
-  async function recuperSenha(e) {
-    e.preventDefault();
-    setCarregando(true);
-
-    const email = document.getElementById("emailRecuperacao").value;
-
-    if (!email) {
-      M.toast({ html: 'Por favor, insira seu email para recuperação.' });
-      return;
-    }
-
-    try {
-      const response = await fetch(`http://localhost:8080/usuarios/recuperar-senha`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        M.toast({ html: `Erro: ${errorData.message}` });
-        return;
-      }
-
-      M.toast({ html: "Email de recuperação enviado! Verifique sua caixa de entrada." });
-    } catch (error) {
-      console.error("Erro:", error);
-      M.toast({ html: 'Erro ao conectar com a API. Tente novamente mais tarde.' });
-    }
-    setCarregando(false);
-  }
-
   return (
     <div style={{backgroundColor: '#525050ff', width: '100vw', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
       {carregando && <Loader />}
@@ -119,14 +85,14 @@ const LoginUsuario = () => {
 
           <div style={{display: 'flex', flexDirection: 'row', gap: '10px', justifyContent: 'center', alignItems: 'center'}}>
             <button type="submit" className="btn waves-effect waves-light center-align">Login</button>
-            Esqueceu senha <a href="#modalRecuperacao" className="modal-trigger">Clique aqui</a>
+            Esqueceu senha? <a href="#modalRecuperacao" className="modal-trigger">Clique aqui</a>
           </div>
         </form>
         <section style={{marginTop: '20px', textAlign: 'center', backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '5px', width: '100%', boxSizing: 'border-box'}}>
             <p>Ainda não tem uma conta? <a href="/cadastrar">Cadastre-se aqui</a></p>
         </section>
       </div>
-      <ModalRecuperacao submitAction={(e) => recuperSenha(e)}/>
+      <ModalRecuperacao />
     </div>
   );
 };
