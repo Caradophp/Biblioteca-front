@@ -3,6 +3,7 @@ import Toast from "../utils/Toast";
 import ModalConfirme from "../components/ModalConfirme";
 import OptionPanel from "../components/OptionPanel";
 import ButtonsColumn from "../components/ButtonsColumn";
+import { hasRole } from "../utils/Auth";
 // import { LoadingOverlay } from "../utils/Loader";
 
 const ListarLivros = () => {
@@ -244,7 +245,7 @@ const ListarLivros = () => {
                 onConfirm={() => excluirLivro()}
             />
             <h3>Lista de Livros</h3>
-            <OptionPanel 
+            {hasRole(['administrador']) && <OptionPanel 
                 onAdd={() => abrirModal('create')}
                 onRefresh={() => limparBusca()}
                 onSearchChange={handleChange}
@@ -254,7 +255,7 @@ const ListarLivros = () => {
                     <i className="material-icons">send</i>
                     Emprestimo
                 </button>
-            </OptionPanel>
+            </OptionPanel>}
             <div className="table-responsive">
                 <table className="my-table highlight centered">
                     <thead>
@@ -263,7 +264,7 @@ const ListarLivros = () => {
                             <th>Título</th>
                             <th>Autor</th>
                             <th>Ano</th>
-                            <th>Ações</th>
+                            {hasRole(['administrador']) && <th>Ações</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -279,7 +280,7 @@ const ListarLivros = () => {
                                     <button title="Visualizar" style={{cursor: 'pointer'}}><i className="material-icons">visibility</i></button>
                                 </td> */}
                                 <td>
-                                    <ButtonsColumn onEdit={() => abrirModal('edit', livro)} onDelete={() => abrirModalConfirmacao(livro)} onDetails={() => Toast.warning("Funcionalidade não implementada")} />
+                                    {hasRole['administrador'] && <ButtonsColumn onEdit={() => abrirModal('edit', livro)} onDelete={() => abrirModalConfirmacao(livro)} onDetails={() => Toast.warning("Funcionalidade não implementada")} />}
                                 </td>
                             </tr>
                         ))}

@@ -6,6 +6,7 @@ import AutoCompleteField from "../components/AutoCompleteField";
 import DecoratedButton from "../components/DecoratedButton";
 import Modal50Percent from "../components/mod/Modal50Percent";
 import ModalPayment from "../components/mod/ModalPayment";
+import { getUserRole, hasRole } from "../utils/Auth";
 
 const EmprestimosList = () => {
 
@@ -18,6 +19,7 @@ const EmprestimosList = () => {
     const [busca, setBusca] = useState('');
     const [emprestimoSelecionado, setEmprestimoSelecionado] = useState(null);
     const [info, setInfo] = useState(null);
+    const [emprestimoPendente, setEmprestimoPendente] = useState([]);
 
     const modalref = useRef();
     const paymentModal = useRef();
@@ -168,6 +170,44 @@ const EmprestimosList = () => {
                 throw new Error("Usuário não autenticado.");
             }
 
+            if (hasRole(['aluno']) || hasRole(['professor'])) {
+                setBusca(document.getElementById("busca").value)
+                if (busca === '') {
+                    const response = await fetch("http://localhost:8080/emprestimos/usuario", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                            "id_usuario": localStorage.getItem('id_usuario')
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error("Erro ao buscar livros");
+                    }
+                    const data = await response.json();
+                    setEmprestimos(data);
+                    return;
+                } else {
+                    const response = await fetch("http://localhost:8080/emprestimos/usuario/pesquisar?param="+busca, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                            'id_usuario': localStorage.getItem('id_usuario')
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Erro ao buscar empréstimos");
+                    }
+
+                    const data = await response.json();
+                    setEmprestimos(data);
+                    // Toast.info(data.aviso)
+                }
+                return;
+            }
+
             if (busca === '') {
                 const response = await fetch("http://localhost:8080/emprestimos", {
                     method: "GET",
@@ -205,62 +245,75 @@ const EmprestimosList = () => {
     async function buscarEmprestimos() {
         try {
             const fetchEmprestimos = async () => {
-                const response = await fetch("http://localhost:8080/emprestimos", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
 
-                const livrosResponse = await fetch("http://localhost:8080/livros", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
+                let response;
+                if (hasRole(['administrador'])) {
+                    response = await fetch("http://localhost:8080/emprestimos", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    });
 
-                const usuariosResponse = await fetch("http://localhost:8080/usuarios", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
+                    const livrosResponse = await fetch("http://localhost:8080/livros", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    });
 
-                const livrosObj = {}
-                const usuariosObj = {}
-                const dataLivros = await livrosResponse.json();
-                const dataUsuarios = await usuariosResponse.json();
+                    const usuariosResponse = await fetch("http://localhost:8080/usuarios", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    });
 
-                const elemLivro = document.getElementById("tituloLivro");
-                M.Autocomplete.init(elemLivro, {
-                    data: dataLivros.reduce((acc, livro) => {
-                        acc[livro.titulo] = null;
-                        livrosObj[livro.titulo] = livro.id;
-                        return acc;
-                    }, {}),
-                    onAutocomplete: (tituloSelecionado) => {
-                        const idSelecionado = livrosObj[tituloSelecionado];
-                        setIdLivro(idSelecionado);
-                        console.log("Livro selecionado:", tituloSelecionado, "ID:", idSelecionado);
-                    }
-                });
+                    const livrosObj = {}
+                    const usuariosObj = {}
+                    const dataLivros = await livrosResponse.json();
+                    const dataUsuarios = await usuariosResponse.json();
 
-                const elemUsuario = document.getElementById("nomeUsuario");
-                M.Autocomplete.init(elemUsuario, {
-                    data: dataUsuarios.reduce((acc, usuario) => {
-                        acc[usuario.nome] = null;
-                        usuariosObj[usuario.nome] = usuario.id;
-                        return acc;
-                    }, {}),
-                    onAutocomplete: (nomeSelecionado) => {
-                        const idSelecionado = usuariosObj[nomeSelecionado];
-                        setIdUsuario(idSelecionado);
-                        console.log("Usuário selecionado:", nomeSelecionado, "ID:", idSelecionado);
-                    }
+                    const elemLivro = document.getElementById("tituloLivro");
+                    M.Autocomplete.init(elemLivro, {
+                        data: dataLivros.reduce((acc, livro) => {
+                            acc[livro.titulo] = null;
+                            livrosObj[livro.titulo] = livro.id;
+                            return acc;
+                        }, {}),
+                        onAutocomplete: (tituloSelecionado) => {
+                            const idSelecionado = livrosObj[tituloSelecionado];
+                            setIdLivro(idSelecionado);
+                            console.log("Livro selecionado:", tituloSelecionado, "ID:", idSelecionado);
+                        }
+                    });
+
+                    const elemUsuario = document.getElementById("nomeUsuario");
+                    M.Autocomplete.init(elemUsuario, {
+                        data: dataUsuarios.reduce((acc, usuario) => {
+                            acc[usuario.nome] = null;
+                            usuariosObj[usuario.nome] = usuario.id;
+                            return acc;
+                        }, {}),
+                        onAutocomplete: (nomeSelecionado) => {
+                            const idSelecionado = usuariosObj[nomeSelecionado];
+                            setIdUsuario(idSelecionado);
+                            console.log("Usuário selecionado:", nomeSelecionado, "ID:", idSelecionado);
+                        }
+                    });
+                } else {
+                    response = await fetch("http://localhost:8080/emprestimos/usuario", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            'id_usuario': localStorage.getItem('id_usuario'),
+                        },
                 });
+                }
 
 
                 if (!response.ok) {
@@ -424,10 +477,60 @@ const EmprestimosList = () => {
             } catch (error) {
                 Toast.error(error);
             }
+    }
+
+    async function renovar(id) {
+        try {
+            const response = await fetch(`http://localhost:8080/emprestimos/renovar/${id}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    }
+                }
+            );
+
+            let message = await response.json();
+
+            if (!response.ok) {
+                Toast.warning(message.aviso)
+                return;
+            }
+
+            Toast.info('Operação realizada com sucesso')
+
+        } catch (error) {
+            Toast.error(error);
         }
+    }
+
+    async function verificarEmprestimoPendente() {
+        try {
+            const response = await fetch(`http://localhost:8080/emprestimos/verificar/${localStorage.getItem('id_usuario')}`, {
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                }
+            });
+            
+            let message = await response.json();
+            if (!response.ok) {
+                Toast.warning(message.aviso);
+                return;
+            }
+
+            
+            setEmprestimoPendente(true);
+        } catch (error) {
+
+        }
+    }
 
     useEffect(() => {
         buscarEmprestimos();
+        verificarEmprestimoPendente();
         const elems = document.querySelectorAll('.modal');
         M.Modal.init(elems);
     }, []);
@@ -435,6 +538,7 @@ const EmprestimosList = () => {
     return (
         <div>
             <h2>Lista de Empréstimos</h2>
+            {emprestimoPendente && emprestimoPendente.multaValor > 0 && <div className="card-panel yellow lighten-2">Usuário tem uma multa para ser paga</div>}
             <CrudComponent 
                 data={emprestimos}
                 onAdd={() => openInc()}
@@ -488,14 +592,22 @@ const EmprestimosList = () => {
                                 </div>
                             </div>
                             {info.devolvido == false && info.multaValor == 0 && <div className="row">
-                                    <div className="col s11"></div>
-                                    <div className="col s1">
-                                        <DecoratedButton 
-                                            text="Realizar devolução"
-                                            icon="send"
-                                            action={() => devolver(info.id)}
-                                            description="Registra o emprestimo como devolvido"
-                                        />
+                                    <div className="col s10"></div>
+                                    <div className="col s2">
+                                        <div style={{display: 'flex'}}>
+                                            <DecoratedButton 
+                                                text="Realizar devolução"
+                                                icon="send"
+                                                action={() => devolver(info.id)}
+                                                description="Registra o emprestimo como devolvido"
+                                            />
+                                            <DecoratedButton 
+                                                text="Renovar"
+                                                description="Realiza a renovação do empréstimo para mais 10 dias após a data de devolução atual"
+                                                icon="refresh"
+                                                action={() => renovar(info.id)}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -514,20 +626,28 @@ const EmprestimosList = () => {
                             {info.multaValor > 0 && <div className="row">
                                     <div className="col s10"></div>
                                     <div className="col s2">
-                                        <DecoratedButton 
-                                            text="Erro humano"
-                                            description="Anula a multa, considerando que se trata de uma cobrança indevida, por um erro de registro cometido pelo administrador"
-                                            icon="block"
-                                            action={() => erroHumano()}
-                                        />
-                                        <DecoratedButton 
-                                            text="Pagar multa"
-                                            icon="monetization_on"
-                                            action={() => {
-                                                paymentModal.current?.open();
-                                            }}
-                                            description="Realizar pagamento da multa"
-                                        />
+                                        <div style={{display: 'flex'}}>
+                                            <DecoratedButton 
+                                                text="Renovar"
+                                                description="Realiza a renovação do empréstimo para mais 10 dias após a data de devolução atual"
+                                                icon="refresh"
+                                                action={() => renovar(info.id)}
+                                            />
+                                            <DecoratedButton 
+                                                text="Erro humano"
+                                                description="Anula a multa, considerando que se trata de uma cobrança indevida, por um erro de registro cometido pelo administrador"
+                                                icon="block"
+                                                action={() => erroHumano()}
+                                            />
+                                            <DecoratedButton 
+                                                text="Pagar multa"
+                                                icon="monetization_on"
+                                                action={() => {
+                                                    paymentModal.current?.open();
+                                                }}
+                                                description="Realizar pagamento da multa"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -546,6 +666,7 @@ const EmprestimosList = () => {
                             labelField="titulo"
                             selectedId={idLivro}
                             onSelect={(id) => setIdLivro(id)}
+                            requiredAuth={true}
                         />
                         <AutoCompleteField 
                             label="Nome do Usuário"
@@ -553,6 +674,7 @@ const EmprestimosList = () => {
                             labelField="nome"
                             selectedId={idUsuario}
                             onSelect={(id) => setIdUsuario(id)}
+                            requiredAuth={true}
                         />
                     </form>
                 </div>

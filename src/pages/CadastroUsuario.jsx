@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import M from 'materialize-css';
 import Toast from '../utils/Toast';
+import AutoCompleteField from '../components/AutoCompleteField';
 
 const CadastroUsuario = () => {
   const [nome, setNome] = useState('');
@@ -8,9 +9,10 @@ const CadastroUsuario = () => {
   const [senha, setSenha] = useState('');
   const [tipoUsuario, setTipoUsuario] = useState('');
   const [numeroMatricula, setNumeroMatricula] = useState('');
-  const [escola, setEscola] = useState('');
+  // const [escola, setEscola] = useState('');
   const [mensagem, setMensagem] = useState('');
   const [erro, setErro] = useState(null);
+  const [idEscola, setIdEscola] = useState('');
 
   // Inicializar Materialize Select
   useEffect(() => {
@@ -24,13 +26,12 @@ const CadastroUsuario = () => {
     if (name === 'senha') setSenha(value);
     if (name === 'tipoUsuario') setTipoUsuario(value);
     if (name === 'numeroMatricula') setNumeroMatricula(value);
-    if (name === 'escola') setEscola(value);
   };
 
   const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!nome || !email || !senha || !tipoUsuario || !numeroMatricula || !escola) {
+  if (!nome || !email || !senha || !tipoUsuario || !numeroMatricula || !idEscola) {
     setErro('Por favor, preencha todos os campos.');
     return;
   } else {
@@ -43,7 +44,8 @@ const CadastroUsuario = () => {
     senha,
     tipoUsuario,
     matricula: numeroMatricula,
-    escola
+    escolaId: idEscola,
+    // escola
   };
   
   const token = localStorage.getItem("token"); // 🔹 Pega o token salvo no login
@@ -109,10 +111,14 @@ const CadastroUsuario = () => {
           <label htmlFor="numeroMatricula" className={numeroMatricula ? 'active' : ''}>Número de Matrícula</label>
         </div>
 
-        <div className="input-field">
+        {/*<div className="input-field">
           <input type="text" name="escola" id="escola" value={escola} onChange={handleChange} required />
           <label htmlFor="escola" className={escola ? 'active' : ''}>Escola</label>
-        </div>
+        </div>*/}
+
+
+        <AutoCompleteField label="Escola" url="http://localhost:8080/escolas"
+          labelField="nome" selectedId={idEscola} onSelect={(id) => setIdEscola(id)} requiredAuth={false}/>
 
         <button type="submit" className="btn waves-effect waves-light">Cadastrar</button>
       </form>

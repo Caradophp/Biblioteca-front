@@ -112,3 +112,24 @@
     z-index: 9999;
     color: white;
 }
+
+
+.between-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-search-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border: 1px solid black !important;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.user-search-panel .search-field {
+    width: 100%;
+}

@@ -1,33 +1,58 @@
 import { useEffect, useRef, useState } from "react";
 import Toast from "../utils/Toast";
 import M from "materialize-css";
+import { hasRole } from "../utils/Auth";
 
 
-export default function AutoCompleteField({label, url, onSelect, labelField, selectedId}) {
+export default function AutoCompleteField({label, url, onSelect, labelField, selectedId, requiredAuth}) {
     const [data, setData] = useState([]);
     const inputRef = useRef(null);
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await fetch(url, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        if (!requiredAuth) {
+            async function fetchData() {
+                try {
+                    const response = await fetch(url, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    setData(data);
+                } catch (error) { 
+                    Toast.error("Erro ao carregar dados para autocomplete: " + error.message);
                 }
-                const data = await response.json();
-                setData(data);
-            } catch (error) { 
-                Toast.error("Erro ao carregar dados para autocomplete: " + error.message);
             }
-        }
 
-        fetchData();
+            fetchData();
+            return;
+        }
+        if (hasRole(['administrador'])) {
+            async function fetchData() {
+                try {
+                    const response = await fetch(url, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    setData(data);
+                } catch (error) { 
+                    Toast.error("Erro ao carregar dados para autocomplete: " + error.message);
+                }
+            }
+
+            fetchData();   
+        }
     }, [url]);
 
     useEffect(() => {

@@ -7,6 +7,8 @@ const PrivateRoute = ({ children }) => {
   const [status, setStatus] = useState("verificando");
   const modalRef = useRef(null);
 
+  // const rotasXRoles = [];
+
   async function validarToken() {
     const token = localStorage.getItem("token");
 

@@ -11,6 +11,7 @@ import PrivateRoute from './components/Privateroute';
 import ListarLivros from './pages/ListLivros';
 import EmprestimosList from './pages/EmprestimosList';
 import Loader from './components/Loader';
+import Escolas from './pages/Escolas';
 
 function AppContent() {
   const location = useLocation();
@@ -38,6 +39,7 @@ function AppContent() {
             <PrivateRoute>
               <EmprestimosList />
             </PrivateRoute>} />
+          <Route path='/escolas' element={<Escolas />}/>
         </Routes>
       </div>
       <div id="modalSessaoExpirada" class="modal my-modal">

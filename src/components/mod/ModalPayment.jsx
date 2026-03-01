@@ -114,7 +114,9 @@ const ModalPayment = forwardRef(({ info }, ref) => {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <a className="modal-close waves-effect waves-green btn-flat">Cancelar</a>
+                    <a className="modal-close waves-effect waves-green btn-flat" onClick={() => {
+                        instanceRef.current?.close();
+                    }}>Cancelar</a>
                     <button className="waves-effect waves-green btn-flat" type="submit" form="paymentForm">Prosseguir</button>
                 </div>
             </div>

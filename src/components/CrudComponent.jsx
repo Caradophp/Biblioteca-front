@@ -6,6 +6,8 @@ import GlobalConstants from '../utils/GlobalContants';
 import OptionPanel from '../components/OptionPanel';
 import ButtonsColumn from '../components/ButtonsColumn';
 import ModalConfirme from '../components/ModalConfirme';
+import { hasRole } from '../utils/Auth';
+import UserSearchPanel from './UserSearchPanel';
 
 const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fields, heads, openModal, extOptions, extButtons,  handleSearchChange, onRefresh}) => {
 
@@ -30,13 +32,15 @@ const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fie
                 onConfirm={() => onDelete()}
             />
 
-            <OptionPanel
+            {hasRole(['aluno', 'professor']) && <UserSearchPanel onSearch={onSearch} />}
+
+            {hasRole(['administrador']) && <OptionPanel
                 onAdd={onAdd}
                 onSearch={handleSearch}
                 onSearchChange={handleSearchChange}
                 onRefresh={onRefresh}
                 children={extOptions}
-            />
+            />}
 
             <table className="my-table highlight centered">
                 <thead>
@@ -44,7 +48,7 @@ const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fie
                         {heads.map(head => (
                             <th key={head}>{head}</th>
                         ))}
-                        <th>Ações</th>
+                        {hasRole(['administrador']) && <th>Ações</th>}
                     </tr>
                 </thead>
 
@@ -55,12 +59,12 @@ const CrudComponent = ({ data, onAdd, onEdit, onDelete, onDetails, onSearch, fie
                                 <td key={field}>{item[field]}</td>
                             ))}
                             <td>
-                                <ButtonsColumn 
+                                {hasRole(['administrador']) && <ButtonsColumn 
                                     onEdit={() => onEdit(item)} 
                                     onDelete={() => openModal(item)} 
                                     onDetails={() => onDetails(item)} 
                                     extraButton={extButtons && React.cloneElement(extButtons, {item})}
-                                />
+                                />}
                             </td>
                         </tr>
                     ))}
