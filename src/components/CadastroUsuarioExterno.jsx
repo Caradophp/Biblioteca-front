@@ -85,7 +85,9 @@ const CadastroUsuarioExterno = () => {
     
     return (
         <div>
-            <h2>Cadastro de Usuário</h2>
+            <div>
+                <img src="/src/assets/image.png" alt="logo" className='responsive-img' />
+            </div>
 
             {mensagem && <div className="card-panel teal lighten-2">{mensagem}</div>}
             {erro && <div className="card-panel red lighten-2">{erro}</div>}

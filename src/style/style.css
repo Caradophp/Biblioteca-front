@@ -133,3 +133,8 @@
 .user-search-panel .search-field {
     width: 100%;
 }
+
+.logo-container {
+    width: 150px;
+    height: 150px;
+}

@@ -87,7 +87,9 @@ const LoginUsuario = () => {
       {carregando && <Loader />}
       <div style={{ backgroundColor: '#ffffff', borderRadius: '10px', padding: '20px', marginTop: '50px', maxWidth: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {login && <div>
-          <h2>Login de Usuário</h2>
+          <div>
+              <img src="/src/assets/image.png" alt="logo" className='responsive-img' />
+          </div>
 
           {mensagem && <div className="card-panel red lighten-2">{mensagem}</div>}
 

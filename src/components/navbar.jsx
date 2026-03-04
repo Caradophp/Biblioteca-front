@@ -1,11 +1,19 @@
 import React from 'react';
 import M from 'materialize-css';
 import { hasRole } from '../utils/Auth';
+import { Navigate } from 'react-router-dom';
 
 const Navbar = () => {
   React.useEffect(() => {
     M.AutoInit(); // Inicia automaticamente os componentes JS do Materialize
   }, []);
+
+  const logout = () => {
+    localStorage.removeItem('id_usuario');
+    localStorage.removeItem('role');
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  }
 
   return (
     <nav>
@@ -18,6 +26,7 @@ const Navbar = () => {
           <li><a href="/livros">Livros</a></li>
           <li><a href="/emprestimos">Emprétimos</a></li>
           <li><a href="/escolas">Escolas</a></li>
+          <li><a onClick={logout}>Sair</a></li>
         </ul>
       </div>
     </nav>
