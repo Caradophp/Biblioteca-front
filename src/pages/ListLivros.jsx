@@ -280,7 +280,7 @@ const ListarLivros = () => {
                                     <button title="Visualizar" style={{cursor: 'pointer'}}><i className="material-icons">visibility</i></button>
                                 </td> */}
                                 <td>
-                                    {hasRole['administrador'] && <ButtonsColumn onEdit={() => abrirModal('edit', livro)} onDelete={() => abrirModalConfirmacao(livro)} onDetails={() => Toast.warning("Funcionalidade não implementada")} />}
+                                    {hasRole(['administrador']) && <ButtonsColumn onEdit={() => abrirModal('edit', livro)} onDelete={() => abrirModalConfirmacao(livro)} onDetails={() => Toast.warning("Funcionalidade não implementada")} />}
                                 </td>
                             </tr>
                         ))}
