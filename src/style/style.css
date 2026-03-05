@@ -138,3 +138,10 @@
     width: 150px;
     height: 150px;
 }
+
+.custom-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}

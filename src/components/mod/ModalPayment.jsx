@@ -1,12 +1,14 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import M from 'materialize-css';
 import Toast from "../../utils/Toast";
+import PixModal from "./PixModal";
 
 const ModalPayment = forwardRef(({ info }, ref) => {
     const modalRef = useRef(null);
     const instanceRef = useRef(null);
     const [forma, setForma] = useState('');
     const [comentarios, setComentarios] = useState('');
+    const pixRef = useRef(null);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -23,6 +25,7 @@ const ModalPayment = forwardRef(({ info }, ref) => {
         }
 
         if (forma === 'pix') {
+            M.Modal.getInstance(pixRef.current).open();
             return;
         }
 
@@ -36,7 +39,8 @@ const ModalPayment = forwardRef(({ info }, ref) => {
                 body: JSON.stringify({
                     idEmprestimo: info.id,
                     multaValor: info.multaValor,
-                    tipoPagamento: forma
+                    tipoPagamento: forma,
+                    comentarios: comentarios
                 })
             })
 
@@ -119,6 +123,7 @@ const ModalPayment = forwardRef(({ info }, ref) => {
                     }}>Cancelar</a>
                     <button className="waves-effect waves-green btn-flat" type="submit" form="paymentForm">Prosseguir</button>
                 </div>
+                <PixModal ref={pixRef} />
             </div>
     );
 });
