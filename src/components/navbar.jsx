@@ -20,12 +20,12 @@ const Navbar = () => {
       <div className="nav-wrapper blue">
         <a href="#" className="brand-logo center">Sistema de Reservas</a>
         <ul className="left hide-on-med-and-down">
-          <li><a href="/">Home</a></li>
+          <li><a href="/home">Home</a></li>
           {hasRole(['administrador']) && <li><a href="/cadastrar">Cadastrar</a></li>}
           {hasRole(['administrador']) && <li><a href="/lista">Lista de Usuários</a></li>}
           <li><a href="/livros">Livros</a></li>
           <li><a href="/emprestimos">Emprétimos</a></li>
-          <li><a href="/escolas">Escolas</a></li>
+          {hasRole(['administrador']) && <li><a href="/escolas">Escolas</a></li>}
           <li><a onClick={logout}>Sair</a></li>
         </ul>
       </div>

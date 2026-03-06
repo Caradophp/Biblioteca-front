@@ -148,19 +148,6 @@ const EmprestimosList = () => {
         } catch (error) {
             Toast.error(error);
         }
-        // if (!response.ok) {
-        //     const errorData = await response.json();
-        //     Toast.error("Erro ao salvar empréstimo: " + errorData.message);
-        //     return;
-        // }
-
-        // Toast.success("Empréstimo registrado com sucesso!");
-        // setIdLivro(null);
-        // setIdUsuario(null);
-        // const elem = document.getElementById("modal1");
-        // const instance = M.Modal.getInstance(elem);
-        // instance.close();
-        // buscarEmprestimos();
     }
 
     async function pesquisar() {
@@ -197,11 +184,15 @@ const EmprestimosList = () => {
                         },
                     });
 
+                    const data = await response.json();
                     if (!response.ok) {
+                        if (data.aviso) {
+                            Toast.info(data.aviso);
+                            return;
+                        }
                         throw new Error("Erro ao buscar empréstimos");
                     }
 
-                    const data = await response.json();
                     setEmprestimos(data);
                     // Toast.info(data.aviso)
                 }
@@ -327,38 +318,6 @@ const EmprestimosList = () => {
             fetchEmprestimos();
         } catch (error) {
             Toast.error("Erro ao buscar emprestimos: " + error.message);
-        }
-    }
-
-    async function editar() {
-        try {
-            const response = await fetch(`http://localhost:8080/emprestimos/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-                body: JSON.stringify({
-                    idLivro,
-                    idUsuario
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                Toast.error("Erro ao editar empréstimo: " + errorData.message);
-                return;
-            }
-
-            Toast.success("Empréstimo editado com sucesso!");
-            setIdLivro(null);
-            setIdUsuario(null);
-            const elem = document.getElementById("modal1");
-            const instance = M.Modal.getInstance(elem);
-            instance.close();
-            buscarEmprestimos();
-        } catch (error) {
-            Toast.error("Erro ao editar empréstimo: " + error.message);
         }
     }
     

@@ -26,9 +26,9 @@ export default function Escolas() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === 'estado') setEstado(value);
+        if (name === 'estado') setEstado(value.toUpperCase());
         if (name === 'nome') setNome(value);
-        if (name === 'cidade') setCidade(value);
+        if (name === 'cidade') setCidade(value.toUpperCase());
         if (name === 'bairro') setBairro(value);
         if (name === 'rua') setRua(value);
         if (name === 'numero') setNumero(value);
@@ -55,8 +55,8 @@ export default function Escolas() {
                             nome: nome
                         },
                         endereco: {
-                            estado: estado,
-                            municipio: cidade,
+                            estado: estado.toUpperCase(),
+                            municipio: cidade.toUpperCase(),
                             nomeBairro: bairro,
                             nomeRua: rua,
                             numero: numero
@@ -66,6 +66,7 @@ export default function Escolas() {
 
                 let data = await response.json();
                 if (response.ok) {
+                    setErro('');
                     Toast.success('Escola registrada com sucesso');
                     buscarEscolas();
                     M.Modal.getInstance(modalRef.current).close();
@@ -98,8 +99,8 @@ export default function Escolas() {
                             nome: nome
                         },
                         endereco: {
-                            estado: estado,
-                            municipio: cidade,
+                            estado: estado.toUpperCase(),
+                            municipio: cidade.toUpperCase(),
                             nomeBairro: bairro,
                             nomeRua: rua,
                             numero: numero
@@ -109,6 +110,7 @@ export default function Escolas() {
 
                 let data = await response.json();
                 if (response.ok) {
+                    setErro('');
                     Toast.info('Registro alterado com sucesso');
                     buscarEscolas();
                     M.Modal.getInstance(modalRef.current).close();
@@ -267,13 +269,13 @@ export default function Escolas() {
                             </div>
                             <div className="col s6">
                                 <label htmlFor="estado">Estado:</label>
-                                <input type="text" id="estado" name="estado" value={estado} onChange={handleChange} readOnly={isBloqueado}/>
+                                <input type="text" id="estado" name="estado" value={estado} onChange={handleChange} readOnly={isBloqueado} minLength="2" maxLength="2"/>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col s6">
                                 <label htmlFor="cidade">Cidade</label>
-                                <input type="text" name="cidade" id="cidade" value={cidade} onChange={handleChange} readOnly={isBloqueado}/>
+                                <input type="text" name="cidade" id="cidade" value={cidade} onChange={handleChange} readOnly={isBloqueado} minLength="2" maxLength="2"/>
                             </div>
                             <div className="col s6">
                                 <label htmlFor="bairro">Bairro</label>
