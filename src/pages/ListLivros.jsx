@@ -168,14 +168,16 @@ const ListarLivros = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    'id_usuario': localStorage.getItem('id_usuario'),
                 },
                 body: JSON.stringify({ titulo: titulo, autor, ano, genero, numeroLivro, quantidadeLivros, quantidadePaginas })
             });        
             reConfig();
-            instance.close();
+            instance.current?.close();
             buscarLivros(new Event('submit'));
             Toast.success('Livro adicionado com sucesso!');
         } catch (error) {
+            console.log(error);
             setMensagem('Erro ao adicionar livro.');
         }
     }

@@ -43,7 +43,7 @@ const Navbar = () => {
           {hasRole(['administrador']) && <li><a href="/escolas">Escolas</a></li>}
           <li><a onClick={logout}>Sair</a></li>
         </ul>
-        <ul className="right hide-on-med-and-down" style={{marginRight: '10px', cursor: 'pointer'}} onClick={openNotifications}>
+        <ul className="right hide-on-med-and-down" style={{marginRight: '10px', cursor: 'pointer'}} onClick={openNotifications} title='Notificações'>
           <li><i className='material-icons'>notifications_none</i></li>
         </ul>
       </div>
