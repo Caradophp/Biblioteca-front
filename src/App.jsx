@@ -12,6 +12,7 @@ import ListarLivros from './pages/ListLivros';
 import EmprestimosList from './pages/EmprestimosList';
 import Loader from './components/Loader';
 import Escolas from './pages/Escolas';
+import Footer from './components/Footer';
 
 function AppContent() {
   const location = useLocation();
@@ -41,6 +42,7 @@ function AppContent() {
             </PrivateRoute>} />
           <Route path='/escolas' element={<Escolas />}/>
         </Routes>
+        {!esconderNavbar && <Footer/>}
       </div>
       <div id="modalSessaoExpirada" class="modal my-modal">
         <div class="modal-content">

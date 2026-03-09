@@ -2,7 +2,7 @@ import React from 'react';
 
 const BookCard = ({ book }) => {
   return (
-    <div className="card">
+    <div className="card my-card">
       <div className="card-image">
         <img src={book.image} alt={book.title} />
       </div>
