@@ -18,6 +18,7 @@ export default function Escolas() {
     const [numero, setNumero]= useState('')
     const [id, setId] = useState('');
     const [erro, setErro] = useState('');
+    const [busca, setBusca] = useState('');
     const [isBloqueado, setBloqueado] = useState(false);
 
     const modalRef = useRef();
@@ -203,27 +204,56 @@ export default function Escolas() {
     }
 
     async function buscarEscolas() {
-        try {
-            const response = await fetch(`http://localhost:8080/escolas`, {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+        if (busca === '') {
+            try {
+                const response = await fetch(`http://localhost:8080/escolas`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    }
+                })
+
+                if (!response.ok) {
+                    Toast.error('Erro inesperado ao carregar escolas')
+                    return;
                 }
-            })
 
-            if (!response.ok) {
-                Toast.error('Erro inesperado ao carregar escolas')
-                return;
+                let data = await response.json();
+                setEscolas(data)
+
+
+            } catch (error) {
+                Toast.error(error);
             }
+        } else {
+            try {
+                const response = await fetch(`http://localhost:8080/escolas/busca?param=${busca}`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    }
+                })
 
-            let data = await response.json();
-            setEscolas(data)
+                if (!response.ok) {
+                    Toast.error('Erro inesperado ao carregar escolas')
+                    return;
+                }
+
+                let data = await response.json();
+                setEscolas(data)
 
 
-        } catch (error) {
-            Toast.error(error);
+            } catch (error) {
+                Toast.error(error);
+            }
         }
+    }
+
+    async function pesquisar() {
+        setBusca(document.getElementById("busca").value);
+        buscarEscolas();
     }
 
     useEffect(() => {
@@ -251,12 +281,12 @@ export default function Escolas() {
                     setModalMode('con')
                     abrirModalCon(item);
                 }}
-                onSearch={() => Toast.warning("Não inplementado")}
+                onSearch={pesquisar}
                 fields={["id", "nome"]}
                 heads={["ID", "Escola"]}
                 openModal={(item) => confirmar(item)}
                 handleSearchChange={handleChange}
-                onRefresh={() => Toast.warning("Não inplementado")}
+                onRefresh={buscarEscolas}
             />
             <div id="modal5" class="modal my-modal" ref={modalRef}>
                 <div class="modal-content">
