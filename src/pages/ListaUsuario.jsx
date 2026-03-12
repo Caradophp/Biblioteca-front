@@ -69,7 +69,7 @@ const ListarUsuarios = () => {
     <div className="container">
       <h2 className="center-align">Lista de Usuários</h2>
 
-      <div className="row">
+      {/* <div className="row">
         <div className="col s12">
           <div className="row">
             <div className="input-field col s12">
@@ -84,9 +84,9 @@ const ListarUsuarios = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <table className="striped">
+      <table className="" style={{overflow: 'auto'}}>
         <thead>
           <tr>
             <th>Nome</th>

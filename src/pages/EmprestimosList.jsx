@@ -7,6 +7,7 @@ import DecoratedButton from "../components/DecoratedButton";
 import Modal50Percent from "../components/mod/Modal50Percent";
 import ModalPayment from "../components/mod/ModalPayment";
 import { getUserRole, hasRole } from "../utils/Auth";
+import QuestionPanel from "../components/panels/QuestionPanel";
 
 const EmprestimosList = () => {
 
@@ -20,6 +21,7 @@ const EmprestimosList = () => {
     const [emprestimoSelecionado, setEmprestimoSelecionado] = useState(null);
     const [info, setInfo] = useState(null);
     const [emprestimoPendente, setEmprestimoPendente] = useState([]);
+    const questionRef = useRef(null);
 
     const modalref = useRef();
     const paymentModal = useRef();
@@ -410,7 +412,7 @@ const EmprestimosList = () => {
         }
     }
 
-    async function erroHumano() {    
+    async function erroHumano() {
             try {
                 const response = await fetch(`http://localhost:8080/multa/erro/humano`, {
                     method: 'POST',
@@ -596,7 +598,7 @@ const EmprestimosList = () => {
                                                 text="Erro humano"
                                                 description="Anula a multa, considerando que se trata de uma cobrança indevida, por um erro de registro cometido pelo administrador"
                                                 icon="block"
-                                                action={() => erroHumano()}
+                                                action={() => questionRef.current?.open()}
                                             />
                                             <DecoratedButton 
                                                 text="Pagar multa"
@@ -642,6 +644,7 @@ const EmprestimosList = () => {
                     <button className="btn waves-effect waves-light" type="submit" form="inc">Salvar</button>
                 </div>
             </div>
+            <QuestionPanel question="Tem certeza que deseja marca essa multa como erro humano?" onConfirm={() => erroHumano()} extRef={questionRef}/>
         </div>
     );
 };

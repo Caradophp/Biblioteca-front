@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import BookCard from '../components/BookCard';
+import QuestionPanel from '../components/panels/QuestionPanel';
+import M from 'materialize-css';
 
 const HomePage = () => {
   // Livros de exemplo (no futuro, você pode buscar esses dados de uma API)
@@ -23,6 +25,11 @@ const HomePage = () => {
       image: 'https://images.unsplash.com/photo-1539290731049-b3b226fa01e4',
     },
   ];
+
+  useEffect(() => {
+    var elems = document.querySelectorAll('.fixed-action-btn');
+    var instances = M.FloatingActionButton.init(elems);
+  }, []);
 
   return (
     <div className="container mt-5">
