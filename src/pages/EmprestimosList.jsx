@@ -18,7 +18,6 @@ const EmprestimosList = () => {
     const [idLivro, setIdLivro] = useState(null);
     const [idUsuario, setIdUsuario] = useState(null);
     const [busca, setBusca] = useState('');
-    const [emprestimoSelecionado, setEmprestimoSelecionado] = useState(null);
     const [info, setInfo] = useState(null);
     const [emprestimoPendente, setEmprestimoPendente] = useState([]);
     const questionRef = useRef(null);
@@ -598,7 +597,9 @@ const EmprestimosList = () => {
                                                 text="Erro humano"
                                                 description="Anula a multa, considerando que se trata de uma cobrança indevida, por um erro de registro cometido pelo administrador"
                                                 icon="block"
-                                                action={() => questionRef.current?.open()}
+                                                action={() => {
+                                                    questionRef.current?.open('Deseja realmente registrar a multa como erro humano?', () => erroHumano())
+                                                }}
                                             />
                                             <DecoratedButton 
                                                 text="Pagar multa"
@@ -644,7 +645,7 @@ const EmprestimosList = () => {
                     <button className="btn waves-effect waves-light" type="submit" form="inc">Salvar</button>
                 </div>
             </div>
-            <QuestionPanel question="Tem certeza que deseja marca essa multa como erro humano?" onConfirm={() => erroHumano()} extRef={questionRef}/>
+            <QuestionPanel extRef={questionRef}/>
         </div>
     );
 };

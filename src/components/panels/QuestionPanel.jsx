@@ -1,12 +1,16 @@
 import { useImperativeHandle, useRef, useState } from 'react';
 import DecoratedButton from '../DecoratedButton';
 
-export default function QuestionPanel({question, onConfirm, extRef}) {
+export default function QuestionPanel({extRef}) {
 
     const ref = useRef(null);
     const [ativo, setAtivo] = useState(false);
+    const [question, setQuestion] = useState('');
+    const [callback, setCallback] = useState(null);
 
-    function open() {
+    function open(mensagem, acao) {
+        setQuestion(mensagem);
+        setCallback(() => acao);
         setAtivo(true);
     }
 
@@ -15,7 +19,7 @@ export default function QuestionPanel({question, onConfirm, extRef}) {
     }
 
     useImperativeHandle(extRef, () => ({
-        open: () => open(),
+        open: (msg, acao) => open(msg, acao),
         close: () => close()
     }))
 
@@ -29,7 +33,7 @@ export default function QuestionPanel({question, onConfirm, extRef}) {
                 <div>
                     <DecoratedButton 
                         text="Sim"
-                        action={() => {onConfirm(); close();}}
+                        action={() => {callback(); close();}}
                     />
                     <DecoratedButton 
                         text="Não"
