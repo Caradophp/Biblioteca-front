@@ -8,6 +8,7 @@ import Modal50Percent from "../components/mod/Modal50Percent";
 import ModalPayment from "../components/mod/ModalPayment";
 import { getUserRole, hasRole } from "../utils/Auth";
 import QuestionPanel from "../components/panels/QuestionPanel";
+import { useLoader } from "../components/LoaderContext";
 
 const EmprestimosList = () => {
 
@@ -24,6 +25,7 @@ const EmprestimosList = () => {
 
     const modalref = useRef();
     const paymentModal = useRef();
+    const {show, hide} = useLoader();
     
      const handleChange = (e) => {
         const { name, value } = e.target;
@@ -237,7 +239,7 @@ const EmprestimosList = () => {
     async function buscarEmprestimos() {
         try {
             const fetchEmprestimos = async () => {
-
+                show();
                 let response;
                 if (hasRole(['administrador'])) {
                     response = await fetch("http://localhost:8080/emprestimos", {
@@ -314,6 +316,7 @@ const EmprestimosList = () => {
 
                 const data = await response.json();
                 setEmprestimos(data);
+                hide();
             };
 
             fetchEmprestimos();
@@ -323,6 +326,7 @@ const EmprestimosList = () => {
     }
     
     async function excluir() {
+        show();
         const response = await fetch(`http://localhost:8080/emprestimos/${id}`, {
             method: "DELETE",
             headers: {
@@ -332,6 +336,7 @@ const EmprestimosList = () => {
         });
 
         if (!response.ok) {
+            hide();
             const errorData = await response.json();
             Toast.error("Erro ao excluir empréstimo: " + errorData.aviso);
             return;
@@ -339,6 +344,7 @@ const EmprestimosList = () => {
 
         Toast.success("Empréstimo excluído com sucesso!");
         buscarEmprestimos();
+        hide();
     }
 
     async function refresh() {
@@ -348,7 +354,7 @@ const EmprestimosList = () => {
     }
 
     async function getEmprestimoInfos(item) {
-        
+        show();
         try {
             const response = await fetch(`http://localhost:8080/emprestimos/devolver/${item.id}`, {
                 method: "GET",
@@ -361,12 +367,15 @@ const EmprestimosList = () => {
             let data = await response.json();
 
             if (!response.ok) {
+                hide();
                 Toast.error(data.aviso);
                 return;
             }
 
+            hide();
             setInfo(data);
         } catch(error) {
+            hide();
             Toast.error(error);
         }
 

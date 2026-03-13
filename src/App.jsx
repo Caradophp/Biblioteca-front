@@ -13,6 +13,7 @@ import EmprestimosList from './pages/EmprestimosList';
 import Loader from './components/Loader';
 import Escolas from './pages/Escolas';
 import Footer from './components/Footer';
+import { LoaderProvider } from './components/LoaderContext';
 
 function AppContent() {
   const location = useLocation();
@@ -21,6 +22,7 @@ function AppContent() {
 
   return (
     <>
+    <LoaderProvider>
       {!esconderNavbar && <Navbar />}
       <div>
         {/* <Loader /> */}
@@ -56,6 +58,7 @@ function AppContent() {
           }}><i className='material-icons'>lock_outline</i>Logar Novamente</button>
         </div>
       </div>
+      </LoaderProvider>
     </>
   );
 }
